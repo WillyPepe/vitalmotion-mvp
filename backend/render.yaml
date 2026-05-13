@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: vitalmotion-api
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app_v077_sqlite_connected:app --host 0.0.0.0 --port $PORT

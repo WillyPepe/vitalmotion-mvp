@@ -1,0 +1,294 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><title>VitalMotion MVP v0.7.8.6 Recovery SQLite Connected</title>
+<style>body{font-family:Arial,sans-serif;background:#eef4fb;margin:0;color:#102033}.wrap{max-width:1180px;margin:30px auto;display:grid;grid-template-columns:360px 1fr;gap:20px}.card{background:white;border:1px solid #dce6f2;border-radius:18px;padding:22px;box-shadow:0 8px 24px #0001}.field{margin:10px 0}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}label{font-weight:700;font-size:12px;display:block;margin-bottom:4px}input,select{width:100%;box-sizing:border-box;border:1px solid #d8e2ef;border-radius:10px;padding:10px}.btn{background:#315be8;color:white;border:0;border-radius:10px;padding:12px 18px;font-weight:800;cursor:pointer;width:100%;margin-top:12px}.pill{display:inline-block;padding:6px 10px;border-radius:999px;background:#eef3ff;border:1px solid #d8e2ef;margin:4px;font-size:12px}.pill.on{background:#dce6ff;border-color:#315be8;font-weight:800}.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.kpi{background:#f6f8fc;border:1px solid #dce6f2;border-radius:14px;text-align:center;padding:12px}.kpi b{font-size:22px}.trace{background:#081426;color:#cde5ff;border-radius:14px;padding:16px;font-family:monospace;white-space:pre-wrap;font-size:12px}.block{border:1px solid #dce6f2;border-radius:16px;margin:16px 0;padding:16px}.ex{border-top:1px solid #e5edf7;padding:10px 0}.ex:first-child{border-top:0}.small{font-size:12px;color:#54657a}.danger{background:#fff0f0;border:1px solid #ffb8b8;padding:12px;border-radius:12px;color:#8b0000}.ok{background:#f0fff8;border:1px solid #b4efd3;padding:10px;border-radius:12px}.top{max-width:1180px;margin:18px auto 0;font-weight:900}.api{display:grid;grid-template-columns:1fr auto;gap:10px;margin-bottom:10px}.hidden{display:none}.demo-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}.demo{font-size:11px;padding:7px;border-radius:8px;border:1px solid #b8c7dd;background:#f8fbff;cursor:pointer}.demo:hover{background:#e8f0ff}</style></head><body>
+<div style="background:#1e293b;color:white;padding:10px;font-family:Arial;">
+<strong>VitalMotion v0.7.8.6 Recovery</strong> · Runtime estable recuperado
+</div>
+<div class="top">VitalMotion MVP v0.7.8.6 Recovery — Backend FastAPI + SQLite completo</div><div class="wrap"><div class="card"><h2>Ingreso del usuario</h2><div class="api"><input id="api" value="http://127.0.0.1:8080"/><button onclick="checkApi()">Conectar</button></div><div id="apiStatus" class="small">API no verificada.</div>
+<div class="field">
+  <label>Ejemplos rápidos</label>
+  <div class="demo-grid">
+    <button class="demo" type="button" onclick="loadDemo(0)">1 Verde fuerza 120</button>
+    <button class="demo" type="button" onclick="loadDemo(1)">2 Rodilla/lumbar HTA</button>
+    <button class="demo" type="button" onclick="loadDemo(2)">3 Adulto mayor</button>
+    <button class="demo" type="button" onclick="loadDemo(3)">4 Obesidad + baja energía</button>
+    <button class="demo" type="button" onclick="loadDemo(4)">5 Hombro overhead</button>
+    <button class="demo" type="button" onclick="loadDemo(5)">6 Hipertrofia</button>
+    <button class="demo" type="button" onclick="loadDemo(6)">7 Cardio 45</button>
+    <button class="demo" type="button" onclick="loadDemo(7)">8 Rehab progreso</button>
+    <button class="demo" type="button" onclick="loadDemo(8)">9 Equilibrio limitado</button>
+    <button class="demo" type="button" onclick="loadDemo(9)">10 Red flag edad</button>
+  </div>
+</div>
+<div class="row"><div class="field"><label>Edad</label><input id="age" type="number" min="10" max="100" step="1" value="36"></div><div class="field"><label>Sexo</label><select id="sex"><option>F</option><option>M</option><option>Otro</option></select></div></div><div class="row"><div class="field"><label>Altura cm</label><input id="height" type="number" min="100" max="230" step="1" value="181"></div><div class="field"><label>Peso kg</label><input id="weight" type="number" min="20" max="250" step="1" value="78" step="1" min="20" max="250" inputmode="numeric" oninput="this.value=Math.round(Number(this.value||0))"></div></div><div class="row"><div class="field"><label>Tp pedido 20–120</label><input id="tp" type="number" value="120" min="20" max="120" step="1" oninput="this.value=Math.max(20,Math.min(120,Math.round(Number(this.value||20))))"></div><div class="field"><label>Energía 1–10</label><input id="energy" type="number" min="1" max="10" step="1" value="10" min="1" max="10" step="1" oninput="this.value=Math.max(1,Math.min(10,Math.round(Number(this.value||1))))"></div></div><div class="field"><label>Objetivo</label><select id="goal"><option>fuerza</option><option>cardio</option><option>aliviar dolor</option><option>movilidad</option><option>salud general</option><option>funcional</option><option>hipertrofia/volumen muscular</option><option>entrenamiento deportivo</option><option>rehabilitación en progreso</option><option>rehabilitación pos operación/accidente</option></select></div><h3>Dolencias</h3><div class="field"><label>¿Sentís algún dolor hoy?</label><select id="hasPain" onchange="togglePain()"><option>No</option><option>Sí</option></select></div><div id="painBox" class="hidden"><div id="pains"></div><button class="btn" type="button" onclick="addPain()">+ Agregar dolor</button><div id="painList"></div></div><h3>Condiciones</h3><div id="conditions"></div><h3>Equipamiento</h3><div id="equipment"></div><h3>Limitaciones</h3><div id="limitations"></div><button class="btn" onclick="generate()">Generar sesión conectada a SQLite</button></div><div class="card"><h2>Sesión recomendada</h2><div id="out"><p class="small">Conectá la API y generá una sesión. Esta versión consulta los 2310 ejercicios de SQLite.</p></div></div></div><script>
+window.addEventListener('DOMContentLoaded',()=>{
+  const api=document.getElementById('api');
+  const saved=localStorage.getItem('VITALMOTION_API_URL');
+  if(saved && api){api.value=saved;}
+  if(api){api.addEventListener('change',()=>localStorage.setItem('VITALMOTION_API_URL', api.value.replace(/\/$/,'')));}
+});
+
+const painZones=['cabeza','cuello','cervical','dorsal','lumbar','hombro','espalda alta','espalda baja','pecho','abdominal','brazo biceps/triceps','codo','antebrazo','muñeca','mano','cadera','ingle','gluteo','pierna alta','rodilla','pierna pantorrilla','tobillo','pie'];
+const conditionList=['Hipertensión','Obesidad','Diabetes','Osteoporosis','Cardiopatía','Embarazo/postparto','Pérdida de equilibrio','Antecedente ACV','Neurología importante','TCA activo','Dolor pecho','Síncope/mareos severos','Dolor nocturno severo','Déficit neurológico progresivo','Posoperatorio sin alta','Dolor severo no diagnosticado','Asma','Artritis reumatoidea'];
+const equipList=['Silla','Puedo ir al piso','Bandas','Mancuernas','Barra/discos','Kettlebell','Polea alta','Banco multiposiciones','Multiestacion','Gimnasio','Nada'];
+const limitList=['No puedo piso','No brazos arriba','Poco equilibrio','Mareos'];
+let selected={conditions:[],equipment:['Silla','Puedo ir al piso','Bandas','Mancuernas'],limitations:[]};
+let lastSession=null;
+
+const demoCases=[
+ {age:36,sex:'F',height:181,weight:78,tp:120,energy:10,goal:'fuerza',conditions:[],equipment:['Silla','Puedo ir al piso','Bandas','Mancuernas'],limitations:[],pains:[]},
+ {age:61,sex:'M',height:188,weight:101,tp:120,energy:4,goal:'aliviar dolor',conditions:['Hipertensión','Obesidad'],equipment:['Silla','Puedo ir al piso','Bandas','Mancuernas'],limitations:[],pains:[{zone:'rodilla',level:6},{zone:'lumbar',level:4}]},
+ {age:76,sex:'F',height:164,weight:70,tp:75,energy:6,goal:'funcional',conditions:['Pérdida de equilibrio'],equipment:['Silla','Bandas'],limitations:['Poco equilibrio'],pains:[{zone:'cadera',level:3}]},
+ {age:48,sex:'M',height:172,weight:116,tp:90,energy:3,goal:'bajar peso',conditions:['Obesidad'],equipment:['Silla','Puedo ir al piso','Bandas'],limitations:[],pains:[{zone:'rodilla',level:5}]},
+ {age:42,sex:'F',height:168,weight:66,tp:60,energy:7,goal:'movilidad',conditions:[],equipment:['Silla','Bandas','Mancuernas'],limitations:['No brazos arriba'],pains:[{zone:'hombro',level:5}]},
+ {age:33,sex:'M',height:178,weight:82,tp:100,energy:9,goal:'hipertrofia/volumen muscular',conditions:[],equipment:['Gimnasio','Mancuernas','Barra/discos','Banco multiposiciones'],limitations:[],pains:[]},
+ {age:52,sex:'F',height:170,weight:74,tp:45,energy:8,goal:'cardio',conditions:[],equipment:['Silla','Puedo ir al piso'],limitations:[],pains:[]},
+ {age:57,sex:'M',height:176,weight:88,tp:50,energy:5,goal:'rehabilitación en progreso',conditions:[],equipment:['Silla','Bandas'],limitations:['No puedo piso'],pains:[{zone:'tobillo',level:4}]},
+ {age:69,sex:'F',height:160,weight:79,tp:60,energy:5,goal:'salud general',conditions:['Pérdida de equilibrio','Hipertensión'],equipment:['Silla','Bandas'],limitations:['Poco equilibrio'],pains:[{zone:'rodilla',level:3}]},
+ {age:92,sex:'M',height:170,weight:72,tp:30,energy:5,goal:'movilidad',conditions:[],equipment:['Silla'],limitations:[],pains:[]}
+];
+function setChipsFromDemo(d){
+  selected.conditions=[...(d.conditions||[])];
+  selected.equipment=[...(d.equipment||[])];
+  selected.limitations=[...(d.limitations||[])];
+  renderChips();
+}
+function loadDemo(i){
+  const d=demoCases[i];
+  age.value=d.age; sex.value=d.sex; height.value=d.height; weight.value=Math.round(d.weight);
+  tp.value=d.tp; energy.value=d.energy; goal.value=d.goal;
+  setChipsFromDemo(d);
+  const has=(d.pains||[]).length>0;
+  hasPain.value=has?'Sí':'No';
+  togglePain();
+  const box=document.getElementById('pains');
+  box.innerHTML='';
+  (d.pains||[]).slice(0,3).forEach(p=>{
+    addPain();
+    const row=box.lastElementChild;
+    row.querySelector('.pz').value=p.zone;
+    row.querySelector('.pl').value=p.level;
+  });
+}
+
+function chips(id,list,key){document.getElementById(id).innerHTML=list.map(x=>`<span class="pill ${selected[key].includes(x)?'on':''}" onclick="tog('${key}','${x}')">${x}</span>`).join('')}
+function tog(k,x){selected[k]=selected[k].includes(x)?selected[k].filter(v=>v!==x):[...selected[k],x]; renderChips()}
+function renderChips(){chips('conditions',conditionList,'conditions'); chips('equipment',equipList,'equipment'); chips('limitations',limitList,'limitations')}
+function togglePain(){document.getElementById('painBox').classList.toggle('hidden',document.getElementById('hasPain').value==='No')}
+
+function removePain(idx){
+  if(!selected.pains){selected.pains=[];}
+  selected.pains.splice(idx,1);
+  renderPains();
+}
+function renderPains(){
+  const wrap=document.getElementById('painList');
+  if(!wrap){return;}
+  wrap.innerHTML=(selected.pains||[]).map((p,i)=>`
+    <div class="small" style="margin:4px 0;padding:4px;border:1px solid #ddd;border-radius:6px">
+      ${p.zone} · dolor ${p.level}
+      <button type="button" class="btn" style="padding:2px 6px;font-size:11px" onclick="removePain(${i})">Eliminar</button>
+    </div>
+  `).join('');
+}
+
+function addPain(){const n=document.querySelectorAll('.pain').length;if(n>=3)return; const div=document.createElement('div'); div.className='pain row'; div.innerHTML=`<select class="pz">${painZones.map(z=>`<option>${z}</option>`).join('')}</select><input class="pl" type="number" min="1" max="10" value="5"><button type="button" onclick="this.closest('.pain').remove()" style="border:1px solid #d33;color:#d33;background:#fff;border-radius:8px;padding:6px">X</button>`;document.getElementById('pains').appendChild(div)}
+renderChips();
+async function checkApi(){const base=document.getElementById('api').value.replace(/\/$/,'');localStorage.setItem('VITALMOTION_API_URL',base);try{const r=await fetch(base+'/health');const j=await r.json();document.getElementById('apiStatus').innerHTML=`<div class="ok">API OK · catálogo SQLite: ${j.catalog.total} ejercicios (${j.catalog.strength} fuerza, ${j.catalog.isometrics} isométricos, ${j.catalog.warmups} calentamientos, ${j.catalog.stretches} estiramientos) · integrity: ${j.catalog.integrity_check}</div>`}catch(e){document.getElementById('apiStatus').innerHTML=`<div class="danger">No conecta. Ejecutá: python -m uvicorn app_v077_sqlite_connected:app --host 127.0.0.1 --port 8080</div>`}}
+function payload(){const pains=[...document.querySelectorAll('.pain')].map(d=>({zone:d.querySelector('.pz').value,level:+d.querySelector('.pl').value}));return{age:+age.value,sex:sex.value,height_cm:+height.value,weight_kg:Math.round(+weight.value),requested_time_min:Math.max(20,Math.min(120,Math.round(+tp.value))),energy:Math.max(1,Math.min(10,Math.round(+energy.value))),goal:goal.value,pains:pains,conditions:selected.conditions,equipment:selected.equipment,limitations:selected.limitations}}
+function exHtml(e){
+  const tempoLine = e.tempo ? `<div class="small"><b>Tempo:</b> ${e.tempo} · <b>TUT/repetición:</b> ${e.tempo_total_sec||''}s${e.tempo_reason ? ' · <b>Motivo:</b> '+e.tempo_reason : ''}</div>` : '';
+  const sideLine = e.rest_between_sides_sec ? `<div class="small"><b>Cambio entre lados:</b> ${e.rest_between_sides_sec}s</div>` : '';
+  const ageLine = e.age_policy ? `<div class="small"><b>Edad:</b> ${e.age_policy.band} · ${e.age_policy.explanation}</div>` : '';
+  const formulaLine = e.formula || `hold ${e.hold_sec||''}s + descanso ejercicio ${e.rest_between_exercises_sec||''}s`;
+  return `<div class="ex"><b>${e.name}</b><div class="small">ID ${e.id} · ${e.type} · ${e.zone||''} · lateralidad ${e.laterality} · tiempo ${e.minutes} min</div>${tempoLine}${sideLine}${ageLine}<div class="small">${formulaLine}</div></div>`
+}
+
+
+
+
+
+
+function scoringHtml(j){
+  const st=(j.decision_trace && j.decision_trace.scoring_trace) ? j.decision_trace.scoring_trace : [];
+  if(!st.length){return '';}
+  return `<div class="block" style="background:#f5f3ff;border-color:#a78bfa">
+    <h3>Scoring V12/V12.1</h3>
+    ${st.map(x=>`<div class="small"><b>${x.block}</b> · perfil ${x.profile_id} · candidatos scoreados ${x.scored_candidates} · bloqueados ${x.blocked_by_v12}</div>`).join('')}
+  </div>`;
+}
+
+function fatigueHtml(j){
+  const f=j.fatigue_state;
+  if(!f){return '';}
+  return `<div class="block" style="background:#fff7ed;border-color:#fb923c">
+    <h3>Fatiga y recuperación</h3>
+    <div class="small"><b>Estado:</b> ${f.status}</div>
+    <div class="small"><b>Fatiga:</b> ${f.fatigue_score}/10</div>
+    <div class="small"><b>Recuperación:</b> ${f.recovery_score}/10</div>
+    <div class="small"><b>Te promedio:</b> ${f.avg_te_last_sessions||0} min</div>
+    <div class="small"><b>Dolor promedio:</b> ${f.avg_pain_last_sessions||0}</div>
+    <div class="small"><b>Energía promedio:</b> ${f.avg_energy_last_sessions||0}</div>
+    <div class="small"><b>Recomendación:</b> ${f.recommendation}</div>
+  </div>`;
+}
+
+function progressionHtml(j){
+  const p=j.progression_recommendation;
+  if(!p){return '';}
+  return `<div class="block" style="background:#eefcf3;border-color:#4ade80">
+    <h3>Progresión longitudinal</h3>
+    <div class="small"><b>Estado:</b> ${p.status}</div>
+    <div class="small"><b>Volumen:</b> ${(p.volume_delta*100).toFixed(0)}%</div>
+    <div class="small"><b>Densidad:</b> ${(p.density_delta*100).toFixed(0)}%</div>
+    <div class="small"><b>Carga:</b> ${(p.load_delta*100).toFixed(0)}%</div>
+    <div class="small"><b>Complejidad:</b> ${(p.complexity_delta*100).toFixed(0)}%</div>
+    <div class="small"><b>Motivo:</b> ${p.reason}</div>
+  </div>`;
+}
+
+function detailedFeedbackHtml(j){
+  const d=j.detailed_feedback_adaptation;
+  const s=d && d.summary ? d.summary : {};
+  return `<div class="block" style="background:#fffaf0;border-color:#fbbf24">
+    <h3>Feedback por ejercicio / serie</h3>
+    <div class="small">
+      Feedback ejercicios: ${s.exercise_feedback_count||0} · Series: ${s.set_feedback_count||0} · Isométricos: ${s.isometric_feedback_count||0}<br>
+      RPE serie prom: ${s.avg_set_rpe||0} · Dolor serie prom: ${s.avg_set_pain||0} · Repetiría: ${s.repeat_rate||0}
+    </div>
+    <p class="small">Usá estos botones para guardar feedback detallado de la sesión generada.</p>
+    <button class="btn" type="button" onclick="saveQuickExerciseFeedback()">Guardar feedback simple de ejercicios</button>
+    <button class="btn" type="button" onclick="saveQuickSetFeedback()">Guardar feedback de series fuerza</button>
+    <button class="btn" type="button" onclick="saveQuickIsoFeedback()">Guardar feedback de isométricos</button>
+    <div id="detailFbStatus" class="small"></div>
+  </div>`;
+}
+function allExercisesFromLast(){
+  const out=[];
+  if(!lastSession || !lastSession.blocks){return out;}
+  Object.keys(lastSession.blocks).forEach(block=>{
+    (lastSession.blocks[block]||[]).forEach(e=>out.push({...e, block:block}));
+  });
+  return out;
+}
+async function saveQuickExerciseFeedback(){
+  const base=document.getElementById('api').value.replace(/\/$/,'');
+  const items=allExercisesFromLast().map(e=>({
+    exercise_id:e.id, exercise_name:e.name, block:e.block,
+    difficulty:'adecuado', pain_during:0, pain_zone:'',
+    control_quality:'correcto', would_repeat:true, notes:'feedback rápido'
+  }));
+  const r=await fetch(base+'/feedback/exercise',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({items})});
+  const j=await r.json();
+  document.getElementById('detailFbStatus').innerHTML=`Feedback ejercicios guardado: ${j.saved}`;
+}
+async function saveQuickSetFeedback(){
+  const base=document.getElementById('api').value.replace(/\/$/,'');
+  const items=[];
+  allExercisesFromLast().filter(e=>e.type==='strength').forEach(e=>{
+    const sets=e.sets||1;
+    for(let s=1;s<=sets;s++){
+      items.push({
+        exercise_id:e.id, exercise_name:e.name, set_number:s,
+        weight_kg:0, reps_completed:e.reps||0, rpe:5,
+        pain_during:0, next_load_action:'mantener', notes:'feedback rápido serie'
+      });
+    }
+  });
+  const r=await fetch(base+'/feedback/set',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({items})});
+  const j=await r.json();
+  document.getElementById('detailFbStatus').innerHTML=`Feedback series guardado: ${j.saved}`;
+}
+async function saveQuickIsoFeedback(){
+  const base=document.getElementById('api').value.replace(/\/$/,'');
+  const items=allExercisesFromLast().filter(e=>e.type==='isometric').map(e=>({
+    exercise_id:e.id, exercise_name:e.name,
+    hold_target_sec:e.hold_sec||0, hold_completed_sec:e.hold_sec||0,
+    difficulty:'adecuado', pain_during:0, tremor_fatigue:'normal', notes:'feedback rápido iso'
+  }));
+  const r=await fetch(base+'/feedback/isometric',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({items})});
+  const j=await r.json();
+  document.getElementById('detailFbStatus').innerHTML=`Feedback isométricos guardado: ${j.saved}`;
+}
+
+function feedbackHtml(j){
+  const f=j.feedback_adaptation;
+  const summary=f && f.summary ? f.summary : null;
+  const box = summary ? `<div class="small"><b>Feedback guardado:</b> ${summary.feedback_count} · RPE prom: ${summary.avg_rpe} · Dolor post prom: ${summary.avg_pain_post} · Energía post prom: ${summary.avg_energy_post}</div>` : '';
+  return `<div class="block" style="background:#f8fff3;border-color:#86efac">
+    <h3>Feedback post-sesión</h3>
+    ${box}
+    <div class="row">
+      <div class="field"><label>RPE esfuerzo 1–10</label><input id="fbRpe" type="number" min="1" max="10" value="5"></div>
+      <div class="field"><label>Dolor después 0–10</label><input id="fbPain" type="number" min="0" max="10" value="0"></div>
+    </div>
+    <div class="row">
+      <div class="field"><label>Energía después 1–10</label><input id="fbEnergy" type="number" min="1" max="10" value="6"></div>
+      <div class="field"><label>¿Completaste?</label><select id="fbCompleted"><option value="true">Sí</option><option value="false">No</option></select></div>
+    </div>
+    <div class="field"><label>Notas</label><input id="fbNotes" placeholder="Opcional"></div>
+    <button class="btn" type="button" onclick="saveFeedback()">Guardar feedback</button>
+    <div id="fbStatus" class="small"></div>
+  </div>`;
+}
+async function saveFeedback(){
+  const base=document.getElementById('api').value.replace(/\/$/,'');
+  const data={
+    rpe:Math.max(1,Math.min(10,Math.round(+document.getElementById('fbRpe').value||5))),
+    pain_post:Math.max(0,Math.min(10,Math.round(+document.getElementById('fbPain').value||0))),
+    energy_post:Math.max(1,Math.min(10,Math.round(+document.getElementById('fbEnergy').value||5))),
+    completed:document.getElementById('fbCompleted').value,
+    notes:document.getElementById('fbNotes').value||''
+  };
+  try{
+    const r=await fetch(base+'/feedback/save',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    const j=await r.json();
+    const s=j.feedback_summary || {};
+    document.getElementById('fbStatus').innerHTML=`Guardado OK · feedbacks: ${s.feedback_count} · RPE prom: ${s.avg_rpe} · dolor post prom: ${s.avg_pain_post}`;
+  }catch(e){
+    document.getElementById('fbStatus').innerHTML='Error guardando feedback: '+e.message;
+  }
+}
+
+function historyHtml(j){
+  if(!j.history_summary){return '';}
+  const h=j.history_summary;
+  return `<div class="block" style="background:#f0f7ff;border-color:#93c5fd">
+    <h3>Historial longitudinal</h3>
+    <div class="small"><b>Sesiones acumuladas:</b> ${h.sessions}</div>
+    <div class="small"><b>Tiempo promedio histórico:</b> ${h.avg_te} min</div>
+    <div class="small"><b>Semáforo más frecuente:</b> ${h.most_common_semaphore || '-'}</div>
+    <div class="small"><b>Variación:</b> cada vez que generás sin semilla fija, VitalMotion puede elegir otra combinación válida sin repetir ejercicios dentro de la sesión.</div>
+  </div>`;
+}
+
+function blockHtml(title,arr,min){return `<div class="block"><h3>${title} <span class="pill">${min} min</span></h3>${arr.map(exHtml).join('')}</div>`}
+async function generate(){const base=document.getElementById('api').value.replace(/\/$/,'');localStorage.setItem('VITALMOTION_API_URL',base);document.getElementById('out').innerHTML='Calculando con SQLite...';try{const r=await fetch(base+'/session/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload())});const j=await r.json(); lastSession=j; if(!j.ok){out.innerHTML=`<div class="danger">${j.message}</div><pre>${JSON.stringify(j,null,2)}</pre>`;return} const t=j.time_governance; out.innerHTML=`<div class="kpis"><div class="kpi"><b>${j.tp}</b><br>Tp</div><div class="kpi"><b>${j.target_min}</b><br>Tmax/objetivo</div><div class="kpi"><b>${j.te_min}</b><br>Te</div><div class="kpi"><b>${t.semaphore}</b><br>Semáforo</div><div class="kpi"><b>${j.catalog.total}</b><br>Catálogo</div></div><div class="trace">Catálogo conectado: ${j.catalog.total} ejercicios\nCandidatos: ${JSON.stringify(j.decision_trace.candidate_counts)}\nSeleccionados: ${JSON.stringify(j.decision_trace.selected_counts)}\nDuplicados en sesión: ${j.duplicates.length?j.duplicates.join(', '):'ninguno'}\nBarreras: ${(t.barriers||[]).join(' | ')||'ninguna'}\nFeedback motor: ${j.feedback_adaptation ? j.feedback_adaptation.modifier : '-'}\n${(j.explanation||[]).join('\n')}</div>${historyHtml(j)}${feedbackHtml(j)}${detailedFeedbackHtml(j)}${progressionHtml(j)}${fatigueHtml(j)}${scoringHtml(j)}${blockHtml('Calentamiento',j.blocks.warmups,j.block_minutes.warmups)}${blockHtml('Fuerza',j.blocks.strength,j.block_minutes.strength)}${blockHtml('Isométricos',j.blocks.isometrics,j.block_minutes.isometrics)}${blockHtml('Estiramientos',j.blocks.stretches,j.block_minutes.stretches)}` }catch(e){out.innerHTML=`<div class="danger">Error conectando API: ${e.message}</div>`}}
+</script>
+<div style="margin-top:8px;padding:8px;border:1px solid #999;background:#f8fafc;">
+<strong>Regla unilateral:</strong>
+cuando un ejercicio se realiza por lados, el sistema agrega transición entre lado izquierdo y derecho para mejorar tolerancia y realismo temporal.
+</div>
+
+
+<div style="margin:12px;padding:12px;background:#eef6ff;border:1px solid #93c5fd;border-radius:8px;font-family:Arial;">
+<b>Motor clínico activo:</b><br>
+• Tp/Te adaptativo<br>
+• No Repeat Engine<br>
+• Strength Tolerance<br>
+• SQLite real 2310 ejercicios<br>
+• Runtime FastAPI conectado<br>
+• Recuperación progresiva del sistema real
+</div>
+
+
+<div style="font-size:12px;color:#334155;margin-top:6px;">
+Transición entre lados: +10s
+</div>
+
+
+<div style="padding:8px;margin-top:8px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:6px;">
+<b>Tempo visible:</b> 2-1-2-1<br>
+<b>TUT por repetición:</b> 6s
+</div>
+
+</body></html>
